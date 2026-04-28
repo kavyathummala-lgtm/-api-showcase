@@ -1,0 +1,46 @@
+services:
+
+  python-rest:
+    build: ./python/rest
+    ports:
+      - "8000:8000"
+
+  python-graphql:
+    build: ./python/graphql
+    ports:
+      - "8001:8001"
+
+  python-grpc:
+    build: ./python/grpc
+    ports:
+      - "50051:50051"
+
+  go-rest:
+    build: ./go/rest
+    ports:
+      - "8080:8080"
+
+  go-graphql:
+    build: ./go/graphql
+    ports:
+      - "8081:8081"
+
+  go-grpc:
+    build: ./go/grpc
+    ports:
+      - "50052:50052"
+
+  java-rest:
+    build: ./java/rest
+    ports:
+      - "9000:9000"
+
+  java-graphql:
+    build: ./java/graphql
+    ports:
+      - "9001:9001"
+
+  java-grpc:
+    build: ./java/grpc
+    ports:
+      - "9090:9090"

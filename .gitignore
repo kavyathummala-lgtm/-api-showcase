@@ -1,0 +1,34 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Java / Maven
+target/
+*.class
+*.jar
+
+# Go generated files
+*.pb.go
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Word/Office temp files
+~$*
+
+# Logs
+*.log

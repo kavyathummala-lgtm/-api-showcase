@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package product;
+
+option go_package = "github.com/example/go-grpc/proto";
+
+service ProductService {
+  rpc GetProducts (ProductFilter) returns (ProductList);
+  rpc GetProduct (ProductId) returns (Product);
+  rpc CreateProduct (ProductInput) returns (Product);
+  rpc UpdateProduct (UpdateProductRequest) returns (Product);
+  rpc DeleteProduct (ProductId) returns (DeleteResponse);
+}
+
+message ProductFilter {
+  string name = 1;
+  string category = 2;
+  float min_price = 3;
+  float max_price = 4;
+  int32 page = 5;
+  int32 limit = 6;
+}
+
+message ProductId {
+  string id = 1;
+}
+
+message Product {
+  string id = 1;
+  string name = 2;
+  string category = 3;
+  float price = 4;
+  int32 stock = 5;
+}
+
+message ProductInput {
+  string name = 1;
+  string category = 2;
+  float price = 3;
+  int32 stock = 4;
+}
+
+message UpdateProductRequest {
+  string id = 1;
+  ProductInput input = 2;
+}
+
+message ProductList {
+  repeated Product products = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 pages = 4;
+}
+
+message DeleteResponse {
+  bool success = 1;
+  string message = 2;
+}

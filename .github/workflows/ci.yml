@@ -1,0 +1,84 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Python REST
+        uses: docker/build-push-action@v5
+        with:
+          context: ./python/rest
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/python-rest:latest
+
+      - name: Build and push Python GraphQL
+        uses: docker/build-push-action@v5
+        with:
+          context: ./python/graphql
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/python-graphql:latest
+
+      - name: Build and push Python gRPC
+        uses: docker/build-push-action@v5
+        with:
+          context: ./python/grpc
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/python-grpc:latest
+
+      - name: Build and push Go REST
+        uses: docker/build-push-action@v5
+        with:
+          context: ./go/rest
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/go-rest:latest
+
+      - name: Build and push Go GraphQL
+        uses: docker/build-push-action@v5
+        with:
+          context: ./go/graphql
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/go-graphql:latest
+
+      - name: Build and push Go gRPC
+        uses: docker/build-push-action@v5
+        with:
+          context: ./go/grpc
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/go-grpc:latest
+
+      - name: Build and push Java REST
+        uses: docker/build-push-action@v5
+        with:
+          context: ./java/rest
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/java-rest:latest
+
+      - name: Build and push Java GraphQL
+        uses: docker/build-push-action@v5
+        with:
+          context: ./java/graphql
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/java-graphql:latest
+
+      - name: Build and push Java gRPC
+        uses: docker/build-push-action@v5
+        with:
+          context: ./java/grpc
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/java-grpc:latest

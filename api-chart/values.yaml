@@ -1,0 +1,6 @@
+image: kavyathummala/python-rest
+tag: latest
+port: 8000
+nodePort: 30000
+replicas: 1
+healthPath: /health

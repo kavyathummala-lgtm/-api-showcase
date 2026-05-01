@@ -69,6 +69,19 @@ service ProductService {
 - What is gRPC used for?
 - What is a proto file?
 
+### Answers
+**What is REST and why is it popular?**
+REST uses different URLs for different actions — GET to read, POST to create, PUT to update, DELETE to remove. It is popular because it is simple, uses JSON which everyone understands, and works with any programming language.
+
+**What is the difference between REST and GraphQL?**
+REST has many URLs — one for products, one for users, one for orders. GraphQL has ONE URL and you ask for exactly what you need in one request. REST might give you 20 fields but you only needed 3. GraphQL gives you exactly 3.
+
+**What is gRPC used for?**
+gRPC is used when speed is critical — like communication between internal services where milliseconds matter. Instead of sending readable JSON text, it sends compressed binary data which is much faster. Used by Google, Netflix internally.
+
+**What is a proto file?**
+A proto file defines the structure of your API — what functions exist, what data goes in, what data comes back. It is like a contract both sides agree to. The `.proto` file generates code automatically for any language.
+
 ---
 
 ## 3. Docker
@@ -204,6 +217,16 @@ livenessProbe:
 - What is the difference between readiness and liveness probe?
 - Why do we need health checks in Kubernetes?
 
+### Answers
+**What is a health check?**
+A health check is a special URL `/health` in your API that returns "ok" when the service is running fine. Kubernetes calls this URL automatically to check if the container is alive and ready.
+
+**What is the difference between readiness and liveness probe?**
+Readiness probe asks "is this pod ready to receive traffic?" — if no, Kubernetes stops sending requests to it but does not kill it. Liveness probe asks "is this pod still alive?" — if no, Kubernetes kills it and starts a new one. Readiness = ready for users. Liveness = still breathing.
+
+**Why do we need health checks in Kubernetes?**
+Without health checks, Kubernetes has no way to know if your app crashed inside the container. The container could be running but your code is broken. Health checks let Kubernetes detect this and automatically restart the bad pod.
+
 ---
 
 ## 6. Search, Filter, and Pagination
@@ -234,6 +257,16 @@ GET /products?page=1&limit=10         → pagination
 - What is pagination and why do we need it?
 - What are query parameters?
 - How do you implement search in a REST API?
+
+### Answers
+**What is pagination and why do we need it?**
+Pagination means returning results in small pages instead of all at once. If your database has 10,000 products and someone calls GET /products, sending all 10,000 in one response would be slow and crash the browser. Pagination returns 10 or 20 at a time — page 1, page 2, etc. — so it stays fast.
+
+**What are query parameters?**
+Query parameters are extra instructions added to a URL after a `?`. Example: `/products?category=Electronics&limit=10`. The `category=Electronics` tells the API to filter by Electronics. The `limit=10` tells it to return only 10 results. Multiple parameters are joined with `&`.
+
+**How do you implement search in a REST API?**
+You read the query parameter from the URL and filter the data. In FastAPI: `@app.get("/products")` with `name: str = None` as a parameter. If name is provided, filter the list to only items where the name contains that word. Return the filtered list.
 
 ---
 
@@ -272,6 +305,19 @@ git log --oneline                 → see commit history
 - What is a branch and why do we use it?
 - What is git stash?
 
+### Answers
+**What is Git and why do we use it?**
+Git tracks every change you make to your code. If you break something, you can go back to an earlier version. If two developers edit the same file, Git helps merge both changes. Without Git, teams would constantly overwrite each other's work.
+
+**What is the difference between git push and git pull?**
+`git push` sends your changes from your laptop UP to GitHub. `git pull` brings the latest changes FROM GitHub down to your laptop. Push = upload. Pull = download.
+
+**What is a branch and why do we use it?**
+A branch is a separate copy of the code where you can work on a new feature without touching the main code. When the feature is ready and tested, you merge it back into main. This way broken code never reaches production. Example: `git branch add-login` creates a branch for building login.
+
+**What is git stash?**
+Git stash temporarily hides your unfinished changes so you can switch to another task. Your changes are saved but not committed. `git stash` hides them. `git stash pop` brings them back. Useful when someone asks you to fix an urgent bug while you are in the middle of building a feature.
+
 ---
 
 ## 8. GitHub Actions / CI/CD
@@ -306,6 +352,19 @@ All automatic — no manual work
 - What is GitHub Actions?
 - What is the difference between CI and CD?
 - What is a runner?
+
+### Answers
+**What is CI/CD?**
+CI/CD is the automated process of building, testing, and deploying code every time a developer pushes. Without it, developers manually build and deploy — slow, error-prone. With CI/CD, the moment you push code, a robot builds it, runs tests, and deploys it automatically.
+
+**What is GitHub Actions?**
+GitHub Actions is the built-in CI/CD robot inside GitHub. You write instructions in a `.yml` file inside `.github/workflows/`. Every time you push, GitHub Actions reads that file and runs the steps — build Docker image, push to Docker Hub, deploy, etc.
+
+**What is the difference between CI and CD?**
+CI (Continuous Integration) = automatically build and test the code when pushed. CD (Continuous Deployment) = automatically deploy the tested code to production. CI is the build and test part. CD is the release part. In our project: CI builds the 9 Docker images, CD pushes them to Docker Hub.
+
+**What is a runner?**
+A runner is the machine that actually executes the GitHub Actions steps. GitHub provides free runners (`ubuntu-latest`) in the cloud. When you push, GitHub starts a fresh Linux machine, runs all your steps, and shuts it down. You can also set up your own runner on your own server (self-hosted runner).
 
 ---
 
@@ -358,6 +417,19 @@ helm install java-rest api-chart/ --set image=kavyathummala/java-rest --set port
 - What is a Helm chart?
 - What is values.yaml?
 - What is the difference between helm install and helm upgrade?
+
+### Answers
+**What is Helm and why do we use it?**
+Helm is a package manager for Kubernetes — like how npm installs packages for Node.js, Helm installs applications into Kubernetes. Without Helm, you need a separate deployment.yaml and service.yaml for every API. With Helm, one chart deploys any of the 9 APIs just by changing the values.
+
+**What is a Helm chart?**
+A Helm chart is a folder with template YAML files that have variables like `{{ .Values.port }}` instead of hardcoded values. The chart is a reusable blueprint. You fill in the values and it generates the final Kubernetes YAML for you.
+
+**What is values.yaml?**
+`values.yaml` is the settings file for a Helm chart. It contains the actual values — which image to use, which port, how many replicas, which health check path. When you run `helm install`, Helm reads values.yaml and fills in all the `{{ .Values.X }}` variables in the templates.
+
+**What is the difference between helm install and helm upgrade?**
+`helm install` creates a brand new deployment — use this the first time. `helm upgrade` updates an existing deployment — use this when you want to change the image version or any setting. If you run `helm install` when it already exists, you get an error. `helm upgrade` safely applies the change.
 
 ---
 
@@ -420,6 +492,16 @@ print(response.content)
 - What is an LLM?
 - What is Groq?
 
+### Answers
+**What is LangChain?**
+LangChain is a toolkit that makes it easy to connect your Python code to AI models like Claude, ChatGPT, Llama, and Gemini. Instead of writing complex API calls yourself, LangChain gives you simple functions — just call `llm.invoke("your question")` and get the AI response back.
+
+**What is an LLM?**
+LLM stands for Large Language Model. It is the AI brain — like Llama by Meta, GPT-4 by OpenAI, Claude by Anthropic, Gemini by Google. These models are trained on huge amounts of text and can understand and generate human language, answer questions, summarize, and write code.
+
+**What is Groq?**
+Groq is a cloud platform that runs open source AI models like Llama for free — no credit card needed. It is extremely fast because they built custom chips for AI. In our project we use Groq to run the Llama 3.3 70B model without paying anything.
+
 ---
 
 ## 12. LangGraph
@@ -467,6 +549,19 @@ workflow.add_edge("summarize", "recommend")
 - What is the difference between an Agent and a Pipeline?
 - What is a Tool in LangGraph?
 - What is the difference between LangChain and LangGraph?
+
+### Answers
+**What is LangGraph?**
+LangGraph is built on top of LangChain and lets you build AI agents and automated pipelines. LangChain just connects you to an AI model. LangGraph goes further — it lets the AI use tools (call APIs, run functions) and make decisions about what to do next.
+
+**What is the difference between an Agent and a Pipeline?**
+An Agent is flexible — you give it a goal in plain English and it figures out which tools to call and in what order. A Pipeline is fixed — you define exactly which steps run and in what order, every time. Agent = AI decides. Pipeline = you decide.
+
+**What is a Tool in LangGraph?**
+A Tool is a Python function that the AI can choose to call. You mark it with `@tool` and give it a clear description. The AI reads the description, decides if it needs that function, and calls it with the right parameters. In our project: `get_products`, `create_product`, and `delete_product` are tools the AI calls when needed.
+
+**What is the difference between LangChain and LangGraph?**
+LangChain = gives you the connection to the AI model. LangGraph = adds the ability to build agents and multi-step workflows on top of LangChain. You need LangChain to use LangGraph. LangGraph is what makes the AI actually DO things, not just talk.
 
 ---
 

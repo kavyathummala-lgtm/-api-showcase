@@ -560,6 +560,99 @@ Task: Analyze products and identify cheapest, most expensive, dominant category.
 
 ---
 
+## 25. LangGraph API — FastAPI Endpoint (Kubernetes)
+
+**Image:** `kavyathummala/langgraph-agent:latest`
+**K8s Service:** NodePort 30010 → port 8001
+
+**GET /health**
+```json
+{ "status": "ok", "service": "langgraph-agent" }
+```
+
+**POST /agent/ask**
+```json
+Request:  { "question": "show me all products" }
+Response: { "question": "show me all products", "answer": "Here are all the products: Gaming Keyboard $89.99 (Electronics), Smart Watch $199.99 (Electronics)" }
+```
+
+---
+
+## 26. CrewAI API — FastAPI Endpoint (Kubernetes)
+
+**Image:** `kavyathummala/crewai-agent:latest`
+**K8s Service:** NodePort 30011 → port 8002
+
+**GET /health**
+```json
+{ "status": "ok", "service": "crewai-agent" }
+```
+
+**POST /crew/analyze**
+```json
+Request:  { "question": "analyze products" }
+Response: {
+  "question": "analyze products",
+  "answer": "Analysis Report:\n1. Cheapest Product: Coffee Maker at $49.99\n2. Most Expensive: Laptop at $999.99\n3. Dominant Category: Electronics (2/3 products)\n4. Recommendation: Populate catalog to enable deeper analysis."
+}
+```
+
+---
+
+## 27. Google ADK Agent API — FastAPI Endpoint (Kubernetes)
+
+**Framework:** Google Agent Development Kit v1.33.0
+**Model:** groq/llama-3.3-70b-versatile via LiteLLM
+**Image:** `kavyathummala/google-adk-agent:latest`
+**K8s Service:** NodePort 30012 → port 8003
+
+**GET /health**
+```json
+{ "status": "ok", "service": "google-adk-agent" }
+```
+
+**POST /adk/ask**
+```json
+Request:  { "question": "what products are available?" }
+Response: { "question": "what products are available?", "answer": "There are no products available in the catalog." }
+```
+
+**How it works:**
+1. Fetches live product data from python-rest:8000
+2. Passes product context to the ADK Agent's session
+3. ADK Agent uses Groq LLM (via LiteLLM) to answer
+4. Returns structured JSON response
+
+---
+
+## 28. LlamaIndex Pipeline API — FastAPI Endpoint (Kubernetes)
+
+**Framework:** llama-index-core 0.14.21 + llama-index-llms-groq 0.5.0
+**Model:** groq/llama-3.3-70b-versatile
+**Index type:** SummaryIndex (no embeddings needed)
+**Image:** `kavyathummala/llamaindex-pipeline:latest`
+**K8s Service:** NodePort 30013 → port 8004
+
+**GET /health**
+```json
+{ "status": "ok", "service": "llamaindex-pipeline" }
+```
+
+**POST /query**
+```json
+Request:  { "question": "what is the most expensive product?" }
+Response: { "question": "what is the most expensive product?", "answer": "The most expensive product is the Laptop at $999.99." }
+```
+
+**How it works:**
+1. Fetches product data from python-rest:8000
+2. Converts each product to a LlamaIndex Document
+3. Builds a SummaryIndex (in-memory, LLM-based)
+4. Runs query through Groq LLM to generate answer
+5. Returns plain text answer
+
+---
+
 ## Quick Summary — What Each Output Tells You
 
 | Tool | Output Means |
@@ -575,3 +668,5 @@ Task: Analyze products and identify cheapest, most expensive, dominant category.
 | LangGraph agent working | "Calling tool: get_products" then AI response |
 | LangGraph pipeline working | Step 1 → Step 2 → Step 3 → Final Result |
 | CrewAI working | Each agent prints its result, Final Result printed |
+| Google ADK working | ADK agent answers product questions via LiteLLM |
+| LlamaIndex working | RAG pipeline answers queries over product documents |

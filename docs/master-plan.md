@@ -215,49 +215,63 @@ Recommendation: Gaming Keyboard is best value at $89.99
 
 ## PHASE 9 — Wrap AI Frameworks as APIs (✅ Complete)
 
-### What we will do
-Take the AI framework scripts and wrap them in FastAPI so they can be called like a normal API.
+### What we built
+Wrapped both LangGraph and CrewAI scripts in FastAPI, Dockerized them, and deployed to Kubernetes.
 
-### Plan
+### Files created
+- `ai-frameworks/langgraph/api.py` — FastAPI wrapper for ReAct agent
+- `ai-frameworks/crewai/api.py` — FastAPI wrapper for 2-agent crew
+
+### Docker images pushed
+- `kavyathummala/langgraph-agent:latest` → port 8001
+- `kavyathummala/crewai-agent:latest` → port 8002
+
+### Kubernetes services
+- langgraph-agent NodePort 30010 → Running ✅
+- crewai-agent NodePort 30011 → Running ✅
+
+### Output
 ```
-LangGraph agent code
-    ↓
-FastAPI endpoint: POST /agent/ask
-    ↓
-Docker image
-    ↓
-Push to Docker Hub
-    ↓
-Deploy to Kubernetes
-```
+POST /agent/ask   { "question": "show me all products" }
+→ { "answer": "Here are your products: Gaming Keyboard $89.99..." }
 
-### Files to create
-- `ai-frameworks/langgraph/api.py` — FastAPI wrapper for agent
-- `ai-frameworks/crewai/api.py` — FastAPI wrapper for crew
-
-### Expected output
-```
-POST /agent/ask
-body: { "question": "show me all products" }
-
-response: { "answer": "Here are your products: ..." }
+POST /crew/analyze  { "question": "analyze products" }
+→ { "answer": "Cheapest: Coffee Maker $49.99, Most expensive: Laptop $999.99..." }
 ```
 
 ---
 
-## PHASE 10 — Google ADK (❌ Not Started)
+## PHASE 10 — Google ADK (✅ Complete)
 
 ### What is it
-Google's framework for building AI agents. Similar to LangGraph but made by Google.
+Google's Agent Development Kit (v1.33.0) — framework for building AI agents with tools and sessions.
 
-### What we will build
-- Agent example — AI calls your product API
-- Tool example — functions the AI can use
-- Pipeline example — fixed steps
+### What we built
+- ADK agent that fetches product data and answers questions using Groq (via LiteLLM)
+- FastAPI wrapper exposing `POST /adk/ask`
+- Dockerized and deployed to Kubernetes
 
-### Files to create
-- `ai-frameworks/google-adk/agent.py`
-- `ai-frameworks/google-adk/api.py`
+### Files created
+- `ai-frameworks/google-adk/agent.py` — ADK Agent with product context
+- `ai-frameworks/google-adk/api.py` — FastAPI wrapper
+- `ai-frameworks/google-adk/requirements.txt`
+- `ai-frameworks/google-adk/Dockerfile`
+- `ai-frameworks/google-adk/k8s-deployment.yaml`
+
+### Docker image pushed
+- `kavyathummala/google-adk-agent:latest` → port 8003
+
+### Kubernetes service
+- google-adk-agent NodePort 30012 → Running ✅
+
+### Output
+```
+GET  /health
+→ { "status": "ok", "service": "google-adk-agent" }
+
+POST /adk/ask  { "question": "what products are available?" }
+→ { "question": "what products are available?", "answer": "There are no products available in the catalog." }
+```
 
 ---
 
@@ -276,16 +290,38 @@ Run AI models (Claude, Llama, Titan) on Amazon cloud instead of Groq.
 
 ---
 
-## PHASE 12 — LlamaIndex (❌ Not Started)
+## PHASE 12 — LlamaIndex (✅ Complete)
 
 ### What is it
-Connect AI to your own documents and data. AI can search through PDFs, text files, databases and answer questions about them.
+LlamaIndex — framework for building RAG (Retrieval-Augmented Generation) pipelines. Connects AI to your own data.
 
-### What we will build
-- Pipeline that reads product data and answers questions about it
+### What we built
+- LlamaIndex SummaryIndex pipeline that fetches product data from the REST API
+- AI-powered Q&A over the product catalog using Groq (llama-3.3-70b-versatile)
+- FastAPI wrapper exposing `POST /query`
+- Dockerized and deployed to Kubernetes
 
-### Files to create
-- `ai-frameworks/llamaindex/pipeline.py`
+### Files created
+- `ai-frameworks/llamaindex/pipeline.py` — LlamaIndex pipeline with SummaryIndex
+- `ai-frameworks/llamaindex/api.py` — FastAPI wrapper
+- `ai-frameworks/llamaindex/requirements.txt`
+- `ai-frameworks/llamaindex/Dockerfile`
+- `ai-frameworks/llamaindex/k8s-deployment.yaml`
+
+### Docker image pushed
+- `kavyathummala/llamaindex-pipeline:latest` → port 8004
+
+### Kubernetes service
+- llamaindex-pipeline NodePort 30013 → Running ✅
+
+### Output
+```
+GET  /health
+→ { "status": "ok", "service": "llamaindex-pipeline" }
+
+POST /query  { "question": "what products are available?" }
+→ { "question": "what products are available?", "answer": "No products are available." }
+```
 
 ---
 
@@ -311,22 +347,29 @@ Model Context Protocol — a standard way to give tools to AI. Instead of writin
 
 ---
 
-## PHASE 15 — Deploy Everything to Kubernetes (❌ Not Started)
+## PHASE 15 — Deploy Everything to Kubernetes (✅ Complete)
 
-### What we will do
-Deploy all AI framework APIs (wrapped in FastAPI) to Kubernetes using Helm and ArgoCD.
+### What we did
+Deployed all AI framework APIs to Kubernetes (Minikube) with NodePort services.
 
-### Expected final state
+### Final state
 ```
 kubectl get pods
 
-python-rest          Running ✅
-go-rest              Running ✅
-java-rest            Running ✅
-langgraph-agent-api  Running ✅
-crewai-api           Running ✅
-google-adk-api       Running ✅
+python-rest             Running ✅  (NodePort 30000)
+go-rest                 Running ✅  (NodePort 30080)
+java-rest               Running ✅  (NodePort 30006)
+langgraph-agent         Running ✅  (NodePort 30010)
+crewai-agent            Running ✅  (NodePort 30011)
+google-adk-agent        Running ✅  (NodePort 30012)
+llamaindex-pipeline     Running ✅  (NodePort 30013)
 ```
+
+### Docker Hub images
+- kavyathummala/langgraph-agent:latest ✅
+- kavyathummala/crewai-agent:latest ✅
+- kavyathummala/google-adk-agent:latest ✅
+- kavyathummala/llamaindex-pipeline:latest ✅
 
 ---
 
